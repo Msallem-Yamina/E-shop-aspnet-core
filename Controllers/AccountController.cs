@@ -39,7 +39,7 @@ namespace TP_Product.Controllers
                 if (result.Succeeded)
                 {
                     await signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Product");
+                    return RedirectToAction("Index", "Home");
                 }
 
                 foreach (var error in result.Errors)
@@ -54,7 +54,7 @@ namespace TP_Product.Controllers
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Product");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -77,7 +77,7 @@ namespace TP_Product.Controllers
                     {
                         return LocalRedirect(returnUrl);
                     }
-                    return RedirectToAction("Index", "Product");
+                    return RedirectToAction("Index", "Home");
                 }
 
                 ModelState.AddModelError(string.Empty, "Invalid Login Attempt");

@@ -1,0 +1,123 @@
+@model TP_Product.ViewModels.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Tableau de bord";
+
+    var tuiles = new[]
+    {
+        (Icone: "bi-box-seam", Label: "Articles", Valeur: Model.NbArticles.ToString()),
+        (Icone: "bi-tags", Label: "Catégories", Valeur: Model.NbCategories.ToString()),
+        (Icone: "bi-people", Label: "Utilisateurs", Valeur: Model.NbUtilisateurs.ToString()),
+        (Icone: "bi-receipt", Label: "Commandes", Valeur: Model.NbCommandes.ToString()),
+        (Icone: "bi-cash-stack", Label: "Chiffre d'affaires", Valeur: Model.ChiffreAffaires.ToString("0.00") + " DT"),
+        (Icone: "bi-safe", Label: "Valeur du stock", Valeur: Model.ValeurStock.ToString("0.00") + " DT"),
+        (Icone: "bi-x-octagon", Label: "En rupture", Valeur: Model.NbRupture.ToString()),
+        (Icone: "bi-exclamation-triangle", Label: "Stock faible", Valeur: Model.NbStockFaible.ToString())
+    };
+}
+
+<h1 class="page-title mb-1">Tableau de bord</h1>
+<p class="text-muted mb-4">Vue d'ensemble de la boutique.</p>
+
+<div class="row row-cols-2 row-cols-xl-4 g-3 mb-4">
+    @foreach (var tuile in tuiles)
+    {
+        <div class="col">
+            <div class="card border-0 shadow-sm h-100 stat-tile">
+                <div class="text-muted small"><i class="bi @tuile.Icone me-1"></i>@tuile.Label</div>
+                <div class="stat-value">@tuile.Valeur</div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="row row-cols-1 row-cols-xl-3 g-3 mb-4">
+    <div class="col">
+        <div class="card border-0 shadow-sm h-100 p-3">
+            <h2 class="h6 fw-bold mb-3">Articles par catégorie</h2>
+            <partial name="_Barres" model="Model.ArticlesParCategorie" />
+        </div>
+    </div>
+    <div class="col">
+        <div class="card border-0 shadow-sm h-100 p-3">
+            <h2 class="h6 fw-bold mb-3">Utilisateurs par rôle</h2>
+            <partial name="_Barres" model="Model.UtilisateursParRole" />
+        </div>
+    </div>
+    <div class="col">
+        <div class="card border-0 shadow-sm h-100 p-3">
+            <h2 class="h6 fw-bold mb-3">Articles les plus vendus</h2>
+            <partial name="_Barres" model="Model.ArticlesLesPlusVendus" />
+        </div>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-xl-2 g-3">
+    <div class="col">
+        <div class="card border-0 shadow-sm h-100 p-3">
+            <h2 class="h6 fw-bold mb-3">Dernières commandes</h2>
+            @if (!Model.DernieresCommandes.Any())
+            {
+                <p class="text-muted mb-0">Aucune commande pour le moment.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                            <tr><th>Client</th><th>Date</th><th class="text-end">Total</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var commande in Model.DernieresCommandes)
+                            {
+                                <tr>
+                                    <td>@commande.CustomerName</td>
+                                    <td>@commande.OrderDate.ToString("dd/MM/yyyy")</td>
+                                    <td class="text-end">@commande.TotalAmount.ToString("0.00") DT</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col">
+        <div class="card border-0 shadow-sm h-100 p-3">
+            <h2 class="h6 fw-bold mb-3">À réapprovisionner</h2>
+            @if (!Model.ArticlesAReapprovisionner.Any())
+            {
+                <p class="text-muted mb-0">Tous les stocks sont suffisants.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                            <tr><th>Article</th><th class="text-end">Stock</th><th class="text-end">État</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var produit in Model.ArticlesAReapprovisionner)
+                            {
+                                <tr>
+                                    <td><a asp-controller="Product" asp-action="Edit" asp-route-id="@produit.ProductId">@produit.Name</a></td>
+                                    <td class="text-end">@produit.QteStock</td>
+                                    <td class="text-end">
+                                        @if (produit.QteStock <= 0)
+                                        {
+                                            <span class="badge bg-danger"><i class="bi bi-x-octagon me-1"></i>Rupture</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning"><i class="bi bi-exclamation-triangle me-1"></i>Faible</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

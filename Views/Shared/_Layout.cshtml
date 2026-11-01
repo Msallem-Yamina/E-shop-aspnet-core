@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
+@inject TP_Product.Models.Repositories.ICategorieRepository CategRepo
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -7,7 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Gestion des Articles</title>
+    <title>@ViewData["Title"] - E-Shop</title>
     <link rel="stylesheet" href="~/css/bootstrap_Flatly.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
@@ -15,98 +16,127 @@
 </head>
 
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg bg-primary mb-4 py-3" data-bs-theme="dark">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Product" asp-action="Index">Gestion des Articles</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
-                               aria-expanded="false">Liste d'articles</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-controller="Product" asp-action="Index">Tous les
-                                    articles</a>
-                                    <a class="dropdown-item" asp-controller="Product" asp-action="Create">Nouvel Article</a>
-                                </div>
+    <!-- ===== Barre du haut (fixe) ===== -->
+    <nav class="navbar navbar-expand-lg app-topbar fixed-top bg-primary" data-bs-theme="dark">
+        <div class="container-fluid px-3">
+
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-bag-heart-fill me-2 text-success"></i><span>E-<span class="text-success">Shop</span></span>
+            </a>
+
+            <!-- Toujours visible, y compris sur mobile -->
+            <ul class="navbar-nav topbar-actions flex-row align-items-center ms-auto gap-2 order-lg-2">
+                <li class="nav-item">
+                    <a class="nav-link position-relative px-2" asp-controller="Panier" asp-action="Index"
+                       title="Mon panier">
+                        <i class="bi bi-cart3 fs-4"></i>
+                        <span id="cartCount"
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
+                    </a>
+                </li>
+
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" href="#"
+                           role="button" aria-expanded="false">
+                            <i class="bi bi-person-circle fs-5 me-1"></i>
+                            <span class="topbar-user d-none d-md-inline-block text-truncate">@User.Identity.Name</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" data-bs-theme="light">
+                            <li>
+                                <a class="dropdown-item" asp-controller="Dashboard" asp-action="Index">
+                                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                                </a>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
-                                   aria-expanded="false">Catégories</a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" asp-controller="Category" asp-action="Index">Toutes les
-                                        catégories</a>
-                                        <a class="dropdown-item" asp-controller="Category" asp-action="Create">Nouvelle
-                                            catégorie</a>
-                                        </div>
-                                    </li>
-                                    @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
-                                    {
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
-                                               aria-expanded="false">Administration</a>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" asp-controller="Admin" asp-action="CreateRole">Nouveau rôle</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" asp-controller="Admin" asp-action="ListRoles">Liste des
-                                                    rôles</a>
-                                                </div>
-                                            </li>
-                                        }
-                                    </ul>
-                                    <form class="d-flex" asp-area="" asp-controller="Product" asp-action="Search">
-                                        <input class="form-control me-2" type="search" placeholder="Search" name="val">
-                                        <button class="btn btn-secondary" type="submit">Search</button>
-                                    </form>
-                                    <ul class="navbar-nav ms-3">
-                                        @if (SignInManager.IsSignedIn(User))
-                                        {
-                                            <li class="nav-item">
-                                                <form method="post" asp-controller="Account" asp-action="Logout">
-                                                    <button type="submit" class="nav-link btn btn-link py-0">
-                                                        Logout @User.Identity.Name
-                                                    </button>
-                                                </form>
-                                            </li>
-                                        }
-                                        else
-                                        {
-                                            <li class="nav-item">
-                                                <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
-                            </div>
-                        </nav>
-                    </header>
+                            <li>
+                                <a class="dropdown-item" asp-controller="Panier" asp-action="MesCommandes">
+                                    <i class="bi bi-bag-check me-2"></i>Mes commandes
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" asp-controller="Account" asp-action="Logout">
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-light btn-sm" asp-controller="Account" asp-action="Register">Register</a>
+                    </li>
+                }
+            </ul>
 
-                    <div class="container">
-                        <main role="main" class="pb-3">
-                            @RenderBody()
-                        </main>
+            <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#topbarMenu"
+                    aria-controls="topbarMenu" aria-expanded="false" aria-label="Ouvrir le menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Replié derrière le bouton sur mobile -->
+            <div class="collapse navbar-collapse order-lg-1" id="topbarMenu">
+                <ul class="navbar-nav align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="bi bi-house-door me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
+                           aria-expanded="false">
+                            <i class="bi bi-grid-3x3-gap-fill me-1"></i>Catégories
+                        </a>
+                        <ul class="dropdown-menu" data-bs-theme="light">
+                            <li>
+                                <a class="dropdown-item" asp-controller="Home" asp-action="Index">Tous les articles</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            @foreach (var c in CategRepo.GetAll())
+                            {
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Home" asp-action="Index"
+                                       asp-route-categoryId="@c.CategoryId">@c.CategoryName</a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                </ul>
+
+                <form class="topbar-search mx-lg-auto" data-bs-theme="light" asp-area="" asp-controller="Product"
+                      asp-action="Search">
+                    <div class="input-group">
+                        <input class="form-control" type="search" placeholder="Rechercher un article..." name="val">
+                        <button class="btn btn-success" type="submit" title="Rechercher"><i class="bi bi-search"></i></button>
                     </div>
+                </form>
+            </div>
+        </div>
+    </nav>
 
-                    <footer class="border-top footer text-muted">
-                        <div class="container">
-                            &copy; 2026 - Gestion des Articles
-                        </div>
-                    </footer>
+    <!-- ===== Contenu (le sidebar vient de _DashboardLayout, choisi dans _ViewStart) ===== -->
+    <main role="main" class="@(ViewData["IsDashboard"] != null ? "" : "container py-4")">
+        @RenderBody()
+    </main>
 
-                    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-                    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-                    <script src="~/js/site.js" asp-append-version="true"></script>
-                    @await RenderSectionAsync("Scripts", required: false)
-                </body>
+    <footer class="border-top footer text-muted">
+        <div class="container text-center">
+            &copy; 2026 - E-Shop
+        </div>
+    </footer>
 
-            </html>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/Monscript.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

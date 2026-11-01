@@ -1,0 +1,29 @@
+@{
+    Layout = "_Layout";
+    ViewData["IsDashboard"] = true;
+}
+
+<div class="app-shell">
+    <aside class="app-sidebar offcanvas-lg offcanvas-start" tabindex="-1" id="appSidebar">
+        <div class="offcanvas-header d-lg-none">
+            <h5 class="offcanvas-title">Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#appSidebar"></button>
+        </div>
+        <div class="offcanvas-body d-block p-0">
+            @await Html.PartialAsync("_Sidebar")
+        </div>
+    </aside>
+
+    <div class="app-main">
+        <button class="btn btn-primary d-lg-none mb-3" type="button"
+                data-bs-toggle="offcanvas" data-bs-target="#appSidebar" aria-controls="appSidebar">
+            <i class="bi bi-list me-1"></i>Menu
+        </button>
+
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

@@ -1,0 +1,104 @@
+<div class="sidebar-section">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        bool isAdmin = User.IsInRole("Admin");
+        bool isManager = User.IsInRole("Manager");
+
+        <!-- Profil -->
+        <div class="sidebar-user">
+            <i class="bi bi-person-circle fs-2"></i>
+            <div class="text-truncate">
+                <div class="fw-semibold text-truncate">@User.Identity.Name</div>
+                <small class="text-muted">
+                    @(isAdmin ? "Administrateur" : isManager ? "Manager" : "Client")
+                </small>
+            </div>
+        </div>
+
+        <div class="sidebar-title">Mon espace</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                    <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Panier" asp-action="Index">
+                    <i class="bi bi-cart3 me-2"></i>Mon panier
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Panier" asp-action="MesCommandes">
+                    <i class="bi bi-bag-check me-2"></i>Mes commandes
+                </a>
+            </li>
+        </ul>
+
+        @if (isAdmin || isManager)
+        {
+            <div class="sidebar-title">Gestion</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Product" asp-action="Create">
+                        <i class="bi bi-plus-circle me-2"></i>Nouvel article
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Category" asp-action="Index">
+                        <i class="bi bi-tags me-2"></i>Gérer les catégories
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Category" asp-action="Create">
+                        <i class="bi bi-folder-plus me-2"></i>Nouvelle catégorie
+                    </a>
+                </li>
+            </ul>
+        }
+
+        @if (isAdmin)
+        {
+            <div class="sidebar-title">Administration</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Admin" asp-action="ListRoles">
+                        <i class="bi bi-shield-lock me-2"></i>Liste des rôles
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Admin" asp-action="CreateRole">
+                        <i class="bi bi-person-plus me-2"></i>Nouveau rôle
+                    </a>
+                </li>
+                @* À ajouter quand ces pages existeront :
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Admin" asp-action="Commandes">
+                        <i class="bi bi-receipt me-2"></i>Toutes les commandes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">
+                        <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+                    </a>
+                </li>
+                *@
+            </ul>
+        }
+    }
+    else
+    {
+        <div class="sidebar-title">Bienvenue</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Account" asp-action="Login">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Account" asp-action="Register">
+                    <i class="bi bi-person-plus me-2"></i>Créer un compte
+                </a>
+            </li>
+        </ul>
+    }
+</div>

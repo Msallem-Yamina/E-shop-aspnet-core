@@ -1,0 +1,36 @@
+@model IEnumerable<TP_Product.Models.Category>
+
+@{
+    var activeId = Context.Request.Query["categoryId"].ToString();
+    var isAll = string.IsNullOrEmpty(activeId);
+}
+
+<div class="category-menu card border-0 shadow-sm">
+    <div class="category-menu-header">
+        <i class="bi bi-grid-3x3-gap-fill me-2"></i>Catégories
+    </div>
+
+    <div class="list-group list-group-flush">
+        <a class="list-group-item list-group-item-action category-link @(isAll ? "active" : "")"
+           asp-controller="Product" asp-action="Index">
+            <i class="bi bi-collection me-2"></i>Tous les articles
+        </a>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="list-group-item text-muted small">Aucune catégorie disponible.</div>
+        }
+        else
+        {
+            @foreach (var categorie in Model)
+            {
+                var isActive = activeId == categorie.CategoryId.ToString();
+                <a class="list-group-item list-group-item-action category-link @(isActive ? "active" : "")"
+                   asp-controller="Product" asp-action="Index"
+                   asp-route-categoryId="@categorie.CategoryId">
+                    <i class="bi bi-tag me-2"></i>@categorie.CategoryName
+                </a>
+            }
+        }
+    </div>
+</div>

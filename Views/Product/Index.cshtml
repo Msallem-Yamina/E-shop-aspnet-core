@@ -6,59 +6,54 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
     <div>
-        <h1 class="page-title mb-0">Gestion des Articles</h1>
-        <small class="text-muted">@Model.Count() article(s)</small>
+        <h1 class="page-title mb-0">
+            @(ViewBag.CategoryName != null ? (string)ViewBag.CategoryName : "Tous les articles")
+        </h1>
+        @if (Model.Any())
+        {
+            <small class="text-muted">@Model.Count() article(s) affiché(s)</small>
+        }
     </div>
-    <a asp-action="Create" class="btn btn-success btn-lg">+ Nouvel article</a>
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+    {
+        <a asp-action="Create" class="btn btn-success btn-lg">+ Nouvel article</a>
+    }
 </div>
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">Aucun article trouvé.</div>
-}
-
-<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
-@foreach (var product in Model)
-{
-    var photoPath = "~/images/" + (product.Image ?? "noimage.jpg");
-
-    <div class="col">
-        <div class="card product-card shadow-sm h-100" data-href="@Url.Action("Details", new { id = product.ProductId })">
-            <img class="card-img-top" src="@photoPath" asp-append-version="true" alt="@product.Name" />
-            <div class="card-body">
-                <span class="badge bg-secondary mb-2">@product.Category.CategoryName</span>
-                <h5 class="card-title">@product.Name</h5>
-                <p class="price-tag text-primary mb-2">@product.Price DT</p>
-                @if (product.QteStock > 10)
-                {
-                    <span class="badge bg-success">En stock : @product.QteStock</span>
-                }
-                else if (product.QteStock > 0)
-                {
-                    <span class="badge bg-warning text-dark">Stock faible : @product.QteStock</span>
-                }
-                else
-                {
-                    <span class="badge bg-danger">Rupture</span>
-                }
-            </div>
-            <div class="card-footer bg-white border-0 d-flex gap-2 justify-content-center pb-3">
-                <a asp-action="Details" asp-route-id="@product.ProductId" class="btn btn-sm btn-outline-primary">View</a>
-                <a asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-sm btn-outline-secondary">Edit</a>
-                <a asp-action="Delete" asp-route-id="@product.ProductId" class="btn btn-sm btn-outline-danger">Delete</a>
-            </div>
+    <div class="empty-state text-center mb-5">
+        <div class="empty-icon"><i class="bi bi-box-seam"></i></div>
+        <h3 class="mt-3">Aucun article trouvé</h3>
+        <p class="text-muted mb-4">
+            @if (ViewBag.CategoryName != null)
+            {
+                <text>La catégorie <b>@ViewBag.CategoryName</b> ne contient pas encore d'article.</text>
+            }
+            else
+            {
+                <text>Aucun article ne correspond à votre recherche.</text>
+            }
+        </p>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a asp-action="Index" class="btn btn-primary">
+                <i class="bi bi-collection me-1"></i>Voir tous les articles
+            </a>
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                <a asp-action="Create" class="btn btn-success">
+                    <i class="bi bi-plus-lg me-1"></i>Ajouter un article
+                </a>
+            }
         </div>
     </div>
 }
+
+<div class="product-grid">
+    @foreach (var product in Model)
+    {
+        <partial name="_ProductCard" model="product" />
+    }
 </div>
 
-@section Scripts {
-    <script>
-        document.querySelectorAll('.product-card').forEach(function (card) {
-            card.addEventListener('click', function (e) {
-                if (e.target.closest('a, button')) return;
-                window.location.href = card.dataset.href;
-            });
-        });
-    </script>
-}
+<partial name="_Pagination" />

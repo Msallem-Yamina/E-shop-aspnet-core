@@ -26,10 +26,33 @@ namespace TP_Product.Controllers
 
         // GET: ProductController
         [AllowAnonymous]
-        public ActionResult Index()
+        public IActionResult Index(int? categoryId, int page = 1)
         {
-            var Products = ProductRepository.GetAll();
-            return View(Products);
+            int pageSize = 4; // Nombre de produits par page
+
+            IQueryable<Product> productsQuery = ProductRepository.GetAllProducts();
+
+            // Filtrer par catégorie si elle est précisée
+            if (categoryId.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.CategoryId == categoryId);
+                ViewBag.CategoryName = CategRepository.GetById(categoryId.Value)?.CategoryName;
+            }
+
+            // Pagination
+            var totalProducts = productsQuery.Count();
+            var totalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
+
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+
+            var products = productsQuery.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
+            ViewBag.CategoryId = categoryId;
+
+            return View(products);
         }
 
         // GET: ProductController/Details/5

@@ -1,6 +1,6 @@
-# Gestion des Articles
+# E-Shop
 
-Application web **ASP.NET Core MVC (.NET 8)** de gestion d'articles et de catégories, avec accès aux données via **Entity Framework Core (approche Code First)** et gestion des utilisateurs avec **ASP.NET Core Identity**.
+Boutique en ligne **ASP.NET Core MVC (.NET 8)** : catalogue d'articles, panier, commandes et tableau de bord, avec accès aux données via **Entity Framework Core (approche Code First)** et gestion des utilisateurs avec **ASP.NET Core Identity**.
 
 > Enseignant : Malek Zribi
 > TP N°2 : Entity Framework Core (Code First) | TP N°3 : Authentification et autorisation (ASP.NET Identity)
@@ -16,25 +16,34 @@ Application web **ASP.NET Core MVC (.NET 8)** de gestion d'articles et de catég
 - Relation **Category 1 - N Product** (liste déroulante de catégories dans les formulaires)
 - Validation des champs (DataAnnotations)
 - Interface responsive avec le thème Bootswatch **Flatly**, cartes cliquables, badges de stock
+- **Page d'accueil** : articles paginés et filtre par catégorie
 
 ### TP3 : Authentification et autorisation
 
 - **Inscription, connexion et déconnexion** (Register, Login, Logout)
-- Menu dynamique : *Register / Login* ou *Logout + email* selon l'état de connexion
+- Menu dynamique : *Register / Login* ou menu du compte selon l'état de connexion
 - **Gestion des rôles** (Admin, Manager, User) : créer, modifier, supprimer, avec confirmation avant suppression
 - **Affectation des utilisateurs aux rôles** (interrupteurs)
 - **Autorisation par rôle** avec `[Authorize]` et `[AllowAnonymous]`
-- Page **Accès refusé** et menu *Administration* visible uniquement pour l'Admin
+- Page **Accès refusé**
+- **Sidebar** affiché une fois connecté, avec un contenu selon le rôle (absent de la page d'accueil)
 - Interface Login / Register modernisée (labels flottants, icône œil pour afficher le mot de passe)
+
+### Panier, commandes et tableau de bord
+
+- **Panier** : ajout, modification des quantités, suppression et compteur dans la barre de navigation
+- **Commande** : validation du panier, page de confirmation et historique *Mes commandes*
+- **Tableau de bord Admin** : statistiques sur les articles, les catégories, les utilisateurs, les commandes et le stock
+- Tableau de bord simplifié pour les autres utilisateurs connectés
 
 ## Droits par profil
 
-| Profil | Consulter les listes | Détails / créer / modifier / supprimer | Administration (rôles) |
-|---|:---:|:---:|:---:|
-| Visiteur (non connecté) | Oui | Non (redirigé vers Login) | Non |
-| User | Oui | Non (Accès refusé) | Non |
-| Manager | Oui | Oui | Non |
-| Admin | Oui | Oui | Oui |
+| Profil | Catalogue et panier | Commander, tableau de bord | Gérer les catégories | Gérer les articles | Administration (rôles) |
+|---|:---:|:---:|:---:|:---:|:---:|
+| Visiteur (non connecté) | Oui | Non (redirigé vers Login) | Non (redirigé vers Login) | Non (redirigé vers Login) | Non |
+| User | Oui | Oui | Oui | Non (Accès refusé) | Non |
+| Manager | Oui | Oui | Oui | Oui | Non |
+| Admin | Oui | Oui | Oui | Oui | Oui |
 
 ## Technologies
 
@@ -53,16 +62,19 @@ Application web **ASP.NET Core MVC (.NET 8)** de gestion d'articles et de catég
 
 ```
 TP_Product/
-├── Controllers/        ProductController, CategoryController, HomeController,
+├── Controllers/        HomeController (accueil), ProductController, CategoryController,
+│                       PanierController (panier, commandes), DashboardController,
 │                       AccountController (Register, Login, Logout, AccessDenied),
 │                       AdminController (gestion des rôles)
 ├── Models/
-│   ├── Product.cs, Category.cs, AppDbContext.cs (IdentityDbContext)
-│   └── Repositories/   IProductRepository, ICategorieRepository + implémentations
-├── ViewModels/         CreateViewModel, EditViewModel, RegisterViewModel, LoginViewModel,
+│   ├── Product.cs, Category.cs, Order.cs, OrderItem.cs, AppDbContext.cs (IdentityDbContext)
+│   ├── RegisterViewModel.cs
+│   └── Repositories/   IProductRepository, ICategorieRepository, IOrderRepository + implémentations
+├── ViewModels/         CreateViewModel, EditViewModel, LoginViewModel, OrderViewModel,
+│                       CartItemViewModel, AdminDashboardViewModel,
 │                       CreateRoleViewModel, EditRoleViewModel, UserRoleViewModel
-├── Views/              Product/, Category/, Account/, Admin/, Shared/
-├── Migrations/         Migrations EF Core (dont MajIdentity)
+├── Views/              Home/, Product/, Category/, Panier/, Dashboard/, Account/, Admin/, Shared/
+├── Migrations/         Migrations EF Core (dont MajIdentity et Order_Migration)
 ├── wwwroot/            css, js, images
 └── Program.cs          Configuration, injection de dépendances, Identity
 ```
@@ -79,8 +91,8 @@ dotnet tool install --global dotnet-ef --version 8.0.*
 ## Lancer le projet
 
 ```bash
-git clone https://github.com/Msallem-Yamina/TP2-Gestion-Articles.git
-cd TP2-Gestion-Articles
+git clone https://github.com/Msallem-Yamina/Gestion-Articles.git
+cd Gestion-Articles
 dotnet restore
 dotnet ef database update
 dotnet run
@@ -106,6 +118,7 @@ La chaîne de connexion se trouve dans `appsettings.json` :
 |---|---|
 | `Add-Migration InitialCreate` | `dotnet ef migrations add InitialCreate` |
 | `Add-Migration MajIdentity` | `dotnet ef migrations add MajIdentity` |
+| `Add-Migration Order_Migration` | `dotnet ef migrations add Order_Migration` |
 | `Update-Database` | `dotnet ef database update` |
 
 ## Créer le premier administrateur
@@ -120,11 +133,13 @@ Le rôle Admin est nécessaire pour accéder à l'administration, mais il faut �
 
 ## Utilisation
 
-1. Créer quelques **catégories** (menu *Catégories*).
-2. Créer des **articles** avec une image (menu *Liste d'articles > Nouvel Article*).
-3. Cliquer sur une carte pour voir les **détails**, ou utiliser **Edit** / **Delete**.
-4. Utiliser la barre **Search** pour filtrer par nom d'article ou de catégorie.
-5. Gérer les rôles et les utilisateurs depuis le menu **Administration** (Admin uniquement).
+1. Parcourir les articles sur la page d'accueil et les filtrer par catégorie.
+2. Créer des **catégories** depuis le sidebar (*Nouvelle catégorie*).
+3. Créer des **articles** avec une image depuis le sidebar (*Nouvel article*, Admin ou Manager).
+4. Cliquer sur une carte pour voir les **détails** ; Admin et Manager modifient ou suppriment avec les icônes de la carte.
+5. Utiliser la barre de **recherche** pour filtrer par nom d'article ou de catégorie.
+6. Ajouter des articles au **panier**, valider la commande, puis la retrouver dans *Mes commandes*.
+7. Consulter les statistiques dans le **Tableau de bord** et gérer les rôles depuis la section **Administration** du sidebar (Admin uniquement).
 
 ## Auteur
 

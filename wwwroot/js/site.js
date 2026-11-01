@@ -17,3 +17,18 @@ function confirmDelete(uniqueId, isDeleteClicked) {
     deleteSpan.style.display = isDeleteClicked ? 'none' : '';
     confirmSpan.style.display = isDeleteClicked ? '' : 'none';
 }
+document.addEventListener("DOMContentLoaded", function () {
+    var sidebar = document.getElementById("sidebar");
+    var toggleButton = document.getElementById("toggleMenu");
+    if (!sidebar || !toggleButton) return;
+
+    // Retrouver l'état du menu sur les autres pages
+    if (localStorage.getItem("sidebarOpen") === "1") {
+        sidebar.classList.remove("d-none");
+    }
+
+    toggleButton.addEventListener("click", function () {
+        sidebar.classList.toggle("d-none");
+        localStorage.setItem("sidebarOpen", sidebar.classList.contains("d-none") ? "0" : "1");
+    });
+});

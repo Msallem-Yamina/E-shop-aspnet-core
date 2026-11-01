@@ -1,0 +1,56 @@
+@model TP_Product.Models.Order
+
+@{
+    ViewData["Title"] = "Commande validée";
+}
+
+<div class="text-center mb-4">
+    <i class="bi bi-check-circle-fill text-success" style="font-size:5rem"></i>
+    <h1 class="page-title mt-2">Votre commande a été validée !</h1>
+    <p class="text-muted">Merci pour votre achat, <b>@Model.CustomerName</b>. Votre commande a bien été enregistrée.</p>
+</div>
+
+<div class="card border-0 shadow-sm mx-auto" style="max-width:700px;">
+    <div class="card-header bg-primary text-white fw-bold">Récapitulatif de votre commande</div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between">
+            <span>Numéro de commande</span><b>#@Model.Id</b>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+            <span>Date</span><b>@Model.OrderDate.ToString("dd/MM/yyyy à HH:mm")</b>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+            <span>Adresse de livraison</span><b>@Model.Address</b>
+        </li>
+    </ul>
+
+    <table class="table mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Produit</th>
+                <th class="text-center">Qté</th>
+                <th class="text-end">Prix</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td class="text-center">@item.Quantity</td>
+                    <td class="text-end">@((item.Price * item.Quantity).ToString("0.00")) DT</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2" class="text-end fw-bold">Montant total</td>
+                <td class="text-end fw-bold text-primary fs-5">@Model.TotalAmount.ToString("0.00") DT</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="text-center mt-4">
+    <a asp-controller="Product" asp-action="Index" class="btn btn-primary">Continuer mes achats</a>
+</div>

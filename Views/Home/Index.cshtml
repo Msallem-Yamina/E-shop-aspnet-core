@@ -1,8 +1,57 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model List<TP_Product.Models.Product>
+
+@{
+    // Page publique : jamais de sidebar, même connecté
+    Layout = "_Layout";
+    ViewData["Title"] = "Accueil";
+
+    var categories = (IList<TP_Product.Models.Category>)ViewBag.Categories;
+    int? categoryId = ViewBag.CategoryId;
+    var titre = categories.FirstOrDefault(c => c.CategoryId == categoryId)?.CategoryName ?? "Tous les articles";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<section class="shop-hero">
+    <i class="bi bi-bag-heart-fill shop-hero-icon"></i>
+    <div class="shop-hero-text">
+        <h1>Bienvenue sur E-Shop</h1>
+        <p>Tous vos articles au même endroit : choisissez, ajoutez au panier et commandez.</p>
+        <a class="btn btn-success btn-lg" href="#articles">
+            <i class="bi bi-arrow-down-circle me-1"></i>Découvrir les articles
+        </a>
+    </div>
+</section>
+
+<nav class="category-chips" aria-label="Catégories">
+    <a class="category-chip @(categoryId == null ? "active" : "")" asp-controller="Home" asp-action="Index">Tous</a>
+    @foreach (var c in categories)
+    {
+        <a class="category-chip @(c.CategoryId == categoryId ? "active" : "")" asp-controller="Home"
+           asp-action="Index" asp-route-categoryId="@c.CategoryId">@c.CategoryName</a>
+    }
+</nav>
+
+<div id="articles" class="d-flex justify-content-between align-items-baseline mt-3 mb-3">
+    <h2 class="section-title">@titre</h2>
+    <span class="text-muted">@ViewBag.TotalProducts article(s)</span>
 </div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state text-center">
+        <div class="empty-icon"><i class="bi bi-box-seam"></i></div>
+        <h3 class="mt-3">Aucun article pour le moment</h3>
+        <p class="text-muted mb-4">Cette catégorie ne contient pas encore d'article.</p>
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Voir tous les articles</a>
+    </div>
+}
+else
+{
+    <div class="product-grid">
+        @foreach (var product in Model)
+        {
+            <partial name="_ProductCard" model="product" />
+        }
+    </div>
+
+    <partial name="_Pagination" />
+}

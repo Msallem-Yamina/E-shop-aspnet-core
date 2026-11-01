@@ -9,5 +9,6 @@ namespace TP_Product.Models.Repositories
         void Delete(int Id);
         IList<Product> GetProductsByCategID(int? CategId);
         IList<Product> FindByName(string name);
+        IQueryable<Product> GetAllProducts();
     }
 }
