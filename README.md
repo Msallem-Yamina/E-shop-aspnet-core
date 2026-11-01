@@ -2,12 +2,9 @@
 
 Boutique en ligne **ASP.NET Core MVC (.NET 8)** : catalogue d'articles, panier, commandes et tableau de bord, avec accès aux données via **Entity Framework Core (approche Code First)** et gestion des utilisateurs avec **ASP.NET Core Identity**.
 
-> Enseignant : Malek Zribi
-> TP N°2 : Entity Framework Core (Code First) | TP N°3 : Authentification et autorisation (ASP.NET Identity)
-
 ## Fonctionnalités
 
-### TP2 : Gestion des articles et catégories
+### Gestion des articles et catégories
 
 - CRUD complet des **catégories** (liste, création, modification, détails, suppression)
 - CRUD complet des **articles** (liste en cartes, création, modification, détails, suppression)
@@ -18,7 +15,7 @@ Boutique en ligne **ASP.NET Core MVC (.NET 8)** : catalogue d'articles, panier, 
 - Interface responsive avec le thème Bootswatch **Flatly**, cartes cliquables, badges de stock
 - **Page d'accueil** : articles paginés et filtre par catégorie
 
-### TP3 : Authentification et autorisation
+### Authentification et autorisation
 
 - **Inscription, connexion et déconnexion** (Register, Login, Logout)
 - Menu dynamique : *Register / Login* ou menu du compte selon l'état de connexion
@@ -56,7 +53,7 @@ Boutique en ligne **ASP.NET Core MVC (.NET 8)** : catalogue d'articles, panier, 
 | Front | Bootstrap 5 (thème Bootswatch Flatly), Bootstrap Icons, Razor |
 | Patterns | Repository, Injection de dépendances, ViewModels |
 
-> Le TP original utilise SQL Server LocalDB (Windows uniquement). Le projet a été réalisé sous Ubuntu avec SQLite : le code EF Core est identique, seul le fournisseur change (`UseSqlite` au lieu de `UseSqlServer`).
+> Le projet utilise SQLite. Pour passer à SQL Server, le code EF Core reste identique : seul le fournisseur change (`UseSqlServer` au lieu de `UseSqlite`).
 
 ## Structure du projet
 
@@ -112,7 +109,7 @@ La chaîne de connexion se trouve dans `appsettings.json` :
 }
 ```
 
-Équivalents des commandes du TP (console NuGet de Visual Studio) :
+Commandes de migration (console NuGet de Visual Studio ou terminal) :
 
 | Visual Studio | Terminal |
 |---|---|
@@ -144,5 +141,3 @@ Le rôle Admin est nécessaire pour accéder à l'administration, mais il faut �
 ## Auteur
 
 **Yamina Msallem**
-- TP N°2 : Accès à une base de données avec Entity Framework Core (Code First)
-- TP N°3 : Gestion des utilisateurs, authentification et autorisation avec ASP.NET Identity
